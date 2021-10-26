@@ -16,11 +16,12 @@ var upgrader = websocket.Upgrader{
 }
 
 var keyMap = map[string]int{
-	"1": keybd_event.VK_A,
-	"2": keybd_event.VK_B,
+	"1": keybd_event.VK_F13,
+	//"2": keybd_event.VK_B,
 }
 
 func connect(w http.ResponseWriter, r *http.Request) {
+	log.Println("New client")
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
