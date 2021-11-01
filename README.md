@@ -5,6 +5,8 @@ There are 2 parts:
 - Go server
 - ESP8266 with a physical button
 
+Building live stream (from Twitch) in Hungarian language: https://www.youtube.com/watch?v=WH-XQdwQBS0
+
 ## Go server
 
 The Go part is responsible for the keypress even emulation on the host machine, it starts a websocket server which listens for events.
