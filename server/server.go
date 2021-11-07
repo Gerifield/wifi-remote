@@ -2,12 +2,13 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
-	"github.com/micmonay/keybd_event"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/gorilla/websocket"
+	"github.com/micmonay/keybd_event"
 )
 
 var upgrader = websocket.Upgrader{

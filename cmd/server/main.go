@@ -11,7 +11,7 @@ import (
 
 func main() {
 	addr := flag.String("listen", ":8080", "HTTP listen endpoint")
-	configFile := flag.String("config", "config.json", "Event config file")
+	configFile := flag.String("config", "config/config.json", "Event config file")
 	flag.Parse()
 
 	srv, err := server.New(*configFile)
