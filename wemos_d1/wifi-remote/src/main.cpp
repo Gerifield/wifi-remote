@@ -1,4 +1,4 @@
-const char *password = "wifipassword";
+const char *password = "password";
 
 #include <Arduino.h>
 
@@ -30,7 +30,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 			Serial.printf("[WSc] Connected to url: %s\n", payload);
 
 			// send message to server when Connected
-			webSocket.sendTXT("Connected");
+			//webSocket.sendTXT("Connected");
 		}
 			break;
 		case WStype_TEXT:
@@ -70,25 +70,32 @@ void setup() {
 		delay(1000);
 	}
 
+  // disable AP
+  if(WiFi.getMode() & WIFI_AP) {
+    WiFi.softAPdisconnect(true);
+  }
+
   Serial.write("Starting...\n");
 
-	WiFiMulti.addAP("MikroTik-BFAD45", password);
+  WiFiMulti.addAP("MikroTik-BFAD45", password);
 
-	//WiFi.disconnect();
-	while(WiFiMulti.run() != WL_CONNECTED) {
-		delay(100);
-	}
+  //WiFi.disconnect();
+  while(WiFiMulti.run() != WL_CONNECTED) {
+    delay(100);
+  }
+
   Serial.write("Wifi connected!\n");
+  Serial.println(WiFi.localIP().toString());
 
-	// server address, port and URL
-	webSocket.begin("192.168.88.251", 8080, "/connect");
+  // server address, port and URL
+  webSocket.begin("192.168.88.252", 8080, "/connect");
 
-	// event handler
-	webSocket.onEvent(webSocketEvent);
+  // event handler
+  webSocket.onEvent(webSocketEvent);
 
-	// try ever 5000 again if connection has failed
-	webSocket.setReconnectInterval(5000);
-  
+  // try ever 5000 again if connection has failed
+  webSocket.setReconnectInterval(5000);
+
   // start heartbeat (optional)
   // ping server every 15000 ms
   // expect pong from server within 3000 ms
@@ -111,7 +118,7 @@ void loop() {
       // only toggle the LED if the new button state is HIGH
       if (buttonState == LOW) {
         Serial.write("Button pressed");
-        webSocket.sendTXT("1");
+        webSocket.sendTXT("2");
       }
     }
   }
