@@ -1,69 +1,33 @@
 package server
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"sync"
 
 	"github.com/gorilla/websocket"
-	"github.com/micmonay/keybd_event"
 )
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
+type keyPresser interface {
+	KeyPress(button string) error
+}
+
 // Server .
 type Server struct {
-	configFile string
-	keyboard keybd_event.KeyBonding
-
-	keyMapLock sync.Mutex
-	keyMap map[string]int
+	remote keyPresser
 }
 
 // New .
-func New(configFile string) (*Server, error) {
-	keyboard, err := keybd_event.NewKeyBonding()
-	if err != nil {
-		return nil, err
+func New(remote keyPresser) *Server {
+	return &Server{
+		remote: remote,
 	}
-
-	s := &Server{
-		configFile: configFile,
-		keyboard: keyboard,
-		keyMap: make(map[string]int),
-	}
-
-	return s, s.LoadConfig()
 }
 
-type config struct {
-	Events map[string]int `json:"events"`
-}
-
-func (s *Server) LoadConfig() error {
-	b, err := ioutil.ReadFile(s.configFile)
-	if err != nil {
-		return err
-	}
-
-	var conf config
-	err = json.Unmarshal(b, &conf)
-	if err != nil {
-		return err
-	}
-
-	s.keyMapLock.Lock()
-	s.keyMap = conf.Events
-	s.keyMapLock.Unlock()
-
-	return nil
-}
-
-func (s *Server) Routes() *http.ServeMux{
+func (s *Server) Routes() *http.ServeMux {
 	m := http.NewServeMux()
 
 	m.HandleFunc("/connect", s.handleConnect)
@@ -92,23 +56,12 @@ func (s *Server) handleConnect(rw http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		s.keyMapLock.Lock()
-		key, ok := s.keyMap[string(message)]
-		s.keyMapLock.Unlock()
-
-		if !ok {
-			log.Println("invalid payload", string(message))
-			continue
-		}
-		log.Printf("recv keycode: %d, Message: %s", key, message)
-
-		s.keyboard.SetKeys(key)
-		log.Println("Keypress", key)
-		err = s.keyboard.Launching()
+		log.Println("received button:", string(message))
+		err = s.remote.KeyPress(string(message))
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		log.Println("Keypress done", key)
+		log.Println("keypress done")
 	}
 }

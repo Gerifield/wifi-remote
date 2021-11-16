@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
-	"github.com/gerifield/wifi-remote/server"
 	"log"
 	"net/http"
 	"runtime"
 	"time"
+
+	"github.com/gerifield/wifi-remote/remote"
+	"github.com/gerifield/wifi-remote/server"
+	"github.com/micmonay/keybd_event"
 )
 
 func main() {
@@ -14,11 +17,19 @@ func main() {
 	configFile := flag.String("config", "config/config.json", "Event config file")
 	flag.Parse()
 
-	srv, err := server.New(*configFile)
+	keyboard, err := keybd_event.NewKeyBonding()
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	r, err := remote.New(*configFile, &keyboard)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	srv := server.New(r)
 
 	// For linux, it is very important to wait 2 seconds
 	if runtime.GOOS == "linux" {
