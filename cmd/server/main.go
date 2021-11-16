@@ -4,7 +4,10 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/gerifield/wifi-remote/remote"
@@ -37,6 +40,18 @@ func main() {
 	}
 
 	log.Println("Started", *addr)
+	ch := make(chan os.Signal, 1)
+	go func() {
+		for range ch {
+			log.Println("config reload")
+			err := r.LoadConfig()
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}()
+	signal.Notify(ch, syscall.SIGUSR1)
+
 	err = http.ListenAndServe(*addr, srv.Routes())
 	if err != nil {
 		log.Println(err)
