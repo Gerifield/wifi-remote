@@ -35,16 +35,11 @@
         console.log(event);
     });
 
-    $(".tiles-grid").one("click", function(e){
-        let data = e.target.getAttribute('data-button');
-        if (!data) {
-            data = e.target.parentElement.getAttribute('data-button');
-        }
+    $(".tiles-grid > div").on("click", function(e){
+        let data = e.currentTarget.getAttribute('data-button');
 
-        if (data) {
-            console.log('Button press:', data);
-            socket.send(e.target.getAttribute('data-button'));
-        }
+        console.log('Button press:', data);
+        socket.send(e.target.getAttribute('data-button'));
     });
 </script>
 </body>
