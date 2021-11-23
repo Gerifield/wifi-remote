@@ -36,8 +36,15 @@
     });
 
     $(".tiles-grid").one("click", function(e){
-        console.log('Button press:', e.target.getAttribute('data-button'));
-        socket.send(e.target.getAttribute('data-button'));
+        let data = e.target.getAttribute('data-button');
+        if (!data) {
+            data = e.target.parentElement.getAttribute('data-button');
+        }
+
+        if (data) {
+            console.log('Button press:', data);
+            socket.send(e.target.getAttribute('data-button'));
+        }
     });
 </script>
 </body>

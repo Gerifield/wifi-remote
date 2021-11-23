@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/gorilla/websocket v1.4.2
-	github.com/micmonay/keybd_event v1.1.1
+	github.com/gerifield/keybd_event v1.1.2
 	github.com/stretchr/testify v1.7.0
 )
 

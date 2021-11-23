@@ -12,15 +12,16 @@ import (
 
 	"github.com/gerifield/wifi-remote/remote"
 	"github.com/gerifield/wifi-remote/server"
-	"github.com/micmonay/keybd_event"
+	"github.com/gerifield/keybd_event"
 )
 
 func main() {
 	addr := flag.String("listen", ":8080", "HTTP listen endpoint")
 	configFile := flag.String("config", "config/config.json", "Event config file")
+	pid := flag.Int("pid", 0, "Process ID to send event to")
 	flag.Parse()
 
-	keyboard, err := keybd_event.NewKeyBonding()
+	keyboard, err := keybd_event.NewKeyBondingWithPID(*pid)
 	if err != nil {
 		log.Println(err)
 		return
