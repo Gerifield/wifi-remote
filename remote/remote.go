@@ -5,15 +5,19 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"sync"
+	"time"
 )
 
 type eventer interface {
 	SetKeys(keys ...int)
-	Launching() error
+	Press() error
+	Release() error
 }
 
 type config struct {
+	KeyPressDelay Duration `json:"key_press_delay"`
 	Events map[string]int `json:"events"`
 }
 
@@ -28,6 +32,7 @@ type Remote struct {
 
 	keyMapLock sync.Mutex
 	keyMap map[string]int
+	keyPressDelay Duration
 }
 
 
@@ -57,7 +62,13 @@ func (r *Remote) LoadConfig() error {
 
 	r.keyMapLock.Lock()
 	r.keyMap = conf.Events
+	if conf.KeyPressDelay.Duration == 0 {
+		conf.KeyPressDelay = Duration{10*time.Millisecond}
+	}
+	r.keyPressDelay = conf.KeyPressDelay
 	r.keyMapLock.Unlock()
+
+	log.Println(r.keyPressDelay)
 
 	return nil
 }
@@ -74,5 +85,40 @@ func (r *Remote) KeyPress(button string) error {
 
 	r.keyboard.SetKeys(key)
 
-	return r.keyboard.Launching()
+	err := r.keyboard.Press()
+	if err != nil {
+		return err
+	}
+	time.Sleep(r.keyPressDelay.Duration)
+	return r.keyboard.Release()
+}
+
+
+type Duration struct {
+	time.Duration
+}
+
+func (d Duration) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
+}
+
+func (d *Duration) UnmarshalJSON(b []byte) error {
+	var v interface{}
+	if err := json.Unmarshal(b, &v); err != nil {
+		return err
+	}
+	switch value := v.(type) {
+	case float64:
+		d.Duration = time.Duration(value)
+		return nil
+	case string:
+		var err error
+		d.Duration, err = time.ParseDuration(value)
+		if err != nil {
+			return err
+		}
+		return nil
+	default:
+		return errors.New("invalid duration")
+	}
 }
