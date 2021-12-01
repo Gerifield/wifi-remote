@@ -18,7 +18,15 @@ type eventer interface {
 
 type config struct {
 	KeyPressDelay Duration `json:"key_press_delay"`
-	Events map[string]int `json:"events"`
+	Buttons       []button `json:"buttons"`
+}
+
+type button struct {
+	ID        string `json:"id"`
+	ColorCode string `json:"color_code"`
+	IconClass string `json:"icon_class"`
+
+	Keycode int `json:"keycode"`
 }
 
 var (
@@ -28,20 +36,18 @@ var (
 
 type Remote struct {
 	configFile string
-	keyboard eventer
+	keyboard   eventer
 
-	keyMapLock sync.Mutex
-	keyMap map[string]int
+	keyMapLock    sync.Mutex
+	keyMap        map[string]int
 	keyPressDelay Duration
 }
-
 
 // New .
 func New(configFile string, keyboard eventer) (*Remote, error) {
 	s := &Remote{
 		configFile: configFile,
-		keyboard: keyboard,
-		keyMap: make(map[string]int),
+		keyboard:   keyboard,
 	}
 
 	return s, s.LoadConfig()
@@ -60,10 +66,15 @@ func (r *Remote) LoadConfig() error {
 		return err
 	}
 
+	events := make(map[string]int)
+	for _, b := range conf.Buttons {
+		events[b.ID] = b.Keycode
+	}
+
 	r.keyMapLock.Lock()
-	r.keyMap = conf.Events
+	r.keyMap = events
 	if conf.KeyPressDelay.Duration == 0 {
-		conf.KeyPressDelay = Duration{10*time.Millisecond}
+		conf.KeyPressDelay = Duration{10 * time.Millisecond}
 	}
 	r.keyPressDelay = conf.KeyPressDelay
 	r.keyMapLock.Unlock()
@@ -92,7 +103,6 @@ func (r *Remote) KeyPress(button string) error {
 	time.Sleep(r.keyPressDelay.Duration)
 	return r.keyboard.Release()
 }
-
 
 type Duration struct {
 	time.Duration

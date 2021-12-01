@@ -49,12 +49,12 @@ func TestKeyPress_InvalidButton(t *testing.T) {
 func TestKeyPress_Success(t *testing.T) {
 	testError := errors.New("testError")
 	te := &testEvent{
-		retError: testError,
+		retPressError: testError,
 	}
 
 	s := &Remote{
 		keyMap: map[string]int{
-		"1": 42,
+			"1": 42,
 		},
 		keyboard: te,
 	}
@@ -65,14 +65,19 @@ func TestKeyPress_Success(t *testing.T) {
 }
 
 type testEvent struct {
-	paramKeys []int
-	retError error
+	paramKeys       []int
+	retPressError   error
+	retReleaseError error
 }
 
 func (te *testEvent) SetKeys(keys ...int) {
 	te.paramKeys = keys
 }
 
-func (te *testEvent) Launching() error {
-	return te.retError
+func (te *testEvent) Press() error {
+	return te.retPressError
+}
+
+func (te *testEvent) Release() error {
+	return te.retReleaseError
 }

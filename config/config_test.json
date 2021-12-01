@@ -1,1 +1,1 @@
-{"events": {"1": 0, "2": 1}}
+{"key_press_delay":"100ms","buttons": [{"id": "1", "keycode": 0, "icon_class": "mif-not"},{"id": "2", "keycode": 1, "icon_class": "mif-fingerprint"}]}
