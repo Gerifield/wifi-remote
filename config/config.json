@@ -1,1 +1,1 @@
-{"key_press_delay":"100ms","buttons": [{"id": "1", "keycode": 0, "icon_class": "mif-not"},{"id": "2", "keycode": 105, "icon_class": "mif-fingerprint"}]}
+{"key_press_delay":"100ms","buttons": [{"id": "1", "keycode": 0, "icon_class": "mif-not"},{"id": "2", "keycode": 105, "color_code": "red","icon_class": "mif-fingerprint"}]}

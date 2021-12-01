@@ -11,13 +11,11 @@
 <body>
 
 <div class="tiles-grid">
-    <div data-role="tile" data-size="medium" data-button="1">
-        <span class="icon mif-not"></span>
+    {{range .Buttons}}
+    <div data-role="tile" data-size="medium" data-button="{{.ID}}" {{if .ColorCode}}style="background-color: {{.ColorCode}}"{{end}}>
+        <span class="icon {{.IconClass}}"></span>
     </div>
-
-    <div data-role="tile" data-size="medium" data-button="2">
-        <span class="icon mif-fingerprint"></span>
-    </div>
+    {{end}}
 </div>
 
 <!-- Metro 4 -->
